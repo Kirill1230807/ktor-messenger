@@ -17,6 +17,8 @@ import java.time.Duration
 import kotlin.time.Duration.Companion.seconds
 import org.jetbrains.exposed.sql.*
 import org.slf4j.event.*
+import com.example.infrastructure.UserTable
+import org.jetbrains.exposed.sql.transactions.transaction
 
 fun Application.configureDatabases() {
     val database = Database.connect(
@@ -25,6 +27,10 @@ fun Application.configureDatabases() {
         driver = "org.h2.Driver",
         password = "",
     )
+
+    transaction(database) {
+        SchemaUtils.create(UserTable)
+    }
     val dbConnection: Connection = connectToPostgres(embedded = true)
     val cityService = CityService(dbConnection)
 
@@ -73,15 +79,15 @@ fun Application.configureDatabases() {
         }
 
         // Read user
-        get("/users/{id}") {
-            val id = call.parameters["id"]?.toInt() ?: throw IllegalArgumentException("Invalid ID")
-            val user = userService.read(id)
-            if (user != null) {
-                call.respond(HttpStatusCode.OK, user)
-            } else {
-                call.respond(HttpStatusCode.NotFound)
-            }
-        }
+//        get("/users/{id}") {
+//            val id = call.parameters["id"]?.toInt() ?: throw IllegalArgumentException("Invalid ID")
+//            val user = userService.read(id)
+//            if (user != null) {
+//                call.respond(HttpStatusCode.OK, user)
+//            } else {
+//                call.respond(HttpStatusCode.NotFound)
+//            }
+//        }
 
         // Update user
         put("/users/{id}") {

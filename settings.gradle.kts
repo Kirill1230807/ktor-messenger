@@ -5,3 +5,7 @@ dependencyResolutionManagement {
         mavenCentral()
     }
 }
+
+include("users")
+include("chat")
+include("notifications")

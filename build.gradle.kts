@@ -1,3 +1,5 @@
+import io.ktor.plugin.KTOR_VERSION
+
 val exposed_version: String by project
 val h2_version: String by project
 val kotlin_version: String by project
@@ -39,6 +41,17 @@ dependencies {
     implementation("io.ktor:ktor-server-config-yaml")
     implementation("io.insert-koin:koin-ktor:4.1.2-Beta1")
     implementation("io.insert-koin:koin-logger-slf4j:4.1.2-Beta1")
+    implementation("io.ktor:ktor-serialization-gson:3.4.0")
     testImplementation("io.ktor:ktor-server-test-host")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
+
+    implementation(project(":users"))
+    implementation(project(":chat"))
+    implementation(project(":notifications"))
+
+    implementation("io.ktor:ktor-server-openapi:3.4.0")
+    implementation("io.ktor:ktor-server-routing-openapi:3.4.0")
+    implementation("io.ktor:ktor-server-swagger")
+    implementation("io.swagger:swagger-generator:3.0.0-rc1")
+    implementation("io.swagger.codegen.v3:swagger-codegen-generators:1.0.36")
 }

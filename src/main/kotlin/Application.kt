@@ -1,9 +1,13 @@
-package com.example
-
+import com.example.configureDatabases
+import com.example.configureMonitoring
+import com.example.configureSecurity
+import com.example.configureSerialization
+import com.example.configureSockets
 import io.ktor.server.application.*
+import io.ktor.server.netty.EngineMain
 
 fun main(args: Array<String>) {
-    io.ktor.server.netty.EngineMain.main(args)
+    EngineMain.main(args)
 }
 
 fun Application.module() {

@@ -11,6 +11,10 @@ repositories {
 
 dependencies {
     testImplementation(kotlin("test"))
+    implementation("io.ktor:ktor-server-core:3.4.0")
+    implementation("io.ktor:ktor-serialization-kotlinx-json:3.4.0")
+
+    implementation("io.swagger:swagger-generator:3.0.0-rc1")
 }
 
 kotlin {

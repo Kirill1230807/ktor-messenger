@@ -5,6 +5,8 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
+import io.ktor.server.routing.delete
+import io.ktor.server.routing.get
 import io.ktor.server.routing.post
 import io.ktor.server.routing.route
 import kotlinx.serialization.Serializable
@@ -28,6 +30,23 @@ fun Route.userRouting(userService: UserService) {
                 call.respond(HttpStatusCode.Created, responseDto)
             } catch (e: IllegalArgumentException) {
                 call.respond(HttpStatusCode.Conflict, mapOf("error" to e.message))
+            }
+        }
+        delete("/{id}") {
+            val idParam = call.parameters["id"]
+            val id = idParam?.toIntOrNull()
+
+            if (id == null) {
+                call.respond(HttpStatusCode.BadRequest, mapOf("error" to "Incorrect ID format"))
+                return@delete
+            }
+
+            val isDeleted = userService.deleteUser(id)
+
+            if (isDeleted) {
+                call.respond(HttpStatusCode.OK, mapOf("message" to "User was deleted"))
+            } else {
+                call.respond(HttpStatusCode.NotFound, mapOf("error" to "Not found"))
             }
         }
     }

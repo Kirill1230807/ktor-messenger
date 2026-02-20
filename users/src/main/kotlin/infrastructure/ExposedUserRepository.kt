@@ -3,6 +3,7 @@ package com.example.infrastructure
 import com.example.domain.User
 import com.example.domain.UserRepository
 import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 
 object UserTable : Table("users") {
@@ -38,5 +39,11 @@ class ExposedUserRepository : UserRepository {
                 User(it[UserTable.id], it[UserTable.username], it[UserTable.email], it[UserTable.password])
             }
             .singleOrNull()
+    }
+
+    override suspend fun deleteUser(id: Int): Boolean = newSuspendedTransaction {
+        val deletedRowCount = UserTable.deleteWhere { UserTable.id eq id }
+
+        deletedRowCount > 0
     }
 }

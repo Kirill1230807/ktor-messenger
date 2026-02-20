@@ -18,4 +18,8 @@ class UserService(private val userRepository: UserRepository) {
         val newUser = User(id = 0, username = username, email = email, passwordHash = passwordHash)
         return userRepository.createUser(newUser)
     }
+
+    suspend fun deleteUser(id: Int): Boolean {
+        return userRepository.deleteUser(id)
+    }
 }

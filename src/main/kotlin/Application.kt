@@ -1,7 +1,6 @@
 import com.example.configureDatabases
 import com.example.configureMonitoring
 import com.example.configureSecurity
-import com.example.configureSerialization
 import com.example.configureSockets
 import io.ktor.server.application.*
 import io.ktor.server.netty.EngineMain

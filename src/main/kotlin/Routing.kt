@@ -1,3 +1,5 @@
+import com.example.api.chatRoute
+import com.example.api.notificationRoute
 import io.ktor.server.application.*
 import io.ktor.server.routing.*
 
@@ -13,5 +15,7 @@ fun Application.configureRouting() {
     routing {
         swaggerUI(path = "swagger", swaggerFile = "openapi/documentation.yaml")
         userRouting(userService)
+        notificationRoute()
+        chatRoute()
     }
 }

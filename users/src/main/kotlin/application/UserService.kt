@@ -5,8 +5,8 @@ import com.example.domain.UserRepository
 
 class UserService(private val userRepository: UserRepository) {
     suspend fun registerUser(username: String, email: String, passwordHash: String): User {
-        val existingUser = userRepository.findByUsername(username)
-        val existingEmail = userRepository.findByEmail(email)
+        val existingUser = userRepository.checkByUsername(username)
+        val existingEmail = userRepository.checkByEmail(email)
 
         if (existingUser != null) {
             throw IllegalArgumentException("This username is already taken")
@@ -21,5 +21,9 @@ class UserService(private val userRepository: UserRepository) {
 
     suspend fun deleteUser(id: Int): Boolean {
         return userRepository.deleteUser(id)
+    }
+
+    suspend fun findUserById(id: Int) : User? {
+        return userRepository.findUserById(id)
     }
 }

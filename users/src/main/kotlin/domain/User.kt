@@ -9,7 +9,8 @@ data class User(
 
 interface UserRepository {
     suspend fun createUser(user: User): User
-    suspend fun findByUsername(username: String): User?
-    suspend fun findByEmail(email: String): User?
+    suspend fun checkByUsername(username: String): User?
+    suspend fun checkByEmail(email: String): User?
     suspend fun deleteUser(id: Int): Boolean
+    suspend fun findUserById(id: Int): User?
 }

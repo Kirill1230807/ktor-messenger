@@ -49,5 +49,21 @@ fun Route.userRouting(userService: UserService) {
                 call.respond(HttpStatusCode.NotFound, mapOf("error" to "Not found"))
             }
         }
+        get("/{id}") {
+            val idUser = call.parameters["id"]?.toIntOrNull()
+
+            if (idUser == null) {
+                call.respond(HttpStatusCode.BadRequest, mapOf("error" to "Incorrect ID format"))
+                return@get
+            }
+
+            val foundUser = userService.findUserById(idUser)
+            if (foundUser == null) {
+                call.respond(HttpStatusCode.NotFound, mapOf("error" to "User not found"))
+            } else {
+                val responseDto = UserResponseDto(foundUser.id, foundUser.username, foundUser.email)
+                call.respond(HttpStatusCode.OK, responseDto)
+            }
+        }
     }
 }

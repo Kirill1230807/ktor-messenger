@@ -1,5 +1,6 @@
 package com.example
 
+import com.example.infrastructure.NotificationTable
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
@@ -30,6 +31,7 @@ fun Application.configureDatabases() {
 
     transaction(database) {
         SchemaUtils.create(UserTable)
+        SchemaUtils.create(NotificationTable)
     }
     val dbConnection: Connection = connectToPostgres(embedded = true)
     val cityService = CityService(dbConnection)

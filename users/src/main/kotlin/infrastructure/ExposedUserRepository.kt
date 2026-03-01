@@ -25,7 +25,7 @@ class ExposedUserRepository : UserRepository {
         user.copy(id = insertStatement[UserTable.id] ?: 0)
     }
 
-    override suspend fun findByUsername(username: String): User? = newSuspendedTransaction {
+    override suspend fun checkByUsername(username: String): User? = newSuspendedTransaction {
         UserTable.selectAll().where { UserTable.username eq username }
             .map {
                 User(it[UserTable.id], it[UserTable.username], it[UserTable.email], it[UserTable.password])
@@ -33,7 +33,7 @@ class ExposedUserRepository : UserRepository {
             .singleOrNull()
     }
 
-    override suspend fun findByEmail(email: String): User? = newSuspendedTransaction {
+    override suspend fun checkByEmail(email: String): User? = newSuspendedTransaction {
         UserTable.selectAll().where { UserTable.email eq email }
             .map {
                 User(it[UserTable.id], it[UserTable.username], it[UserTable.email], it[UserTable.password])
@@ -45,5 +45,13 @@ class ExposedUserRepository : UserRepository {
         val deletedRowCount = UserTable.deleteWhere { UserTable.id eq id }
 
         deletedRowCount > 0
+    }
+
+    override suspend fun findUserById(id: Int): User? = newSuspendedTransaction {
+        UserTable.selectAll().where { UserTable.id eq id }
+            .map {
+                User(it[UserTable.id], it[UserTable.username], it[UserTable.email], it[UserTable.password])
+            }
+            .singleOrNull()
     }
 }

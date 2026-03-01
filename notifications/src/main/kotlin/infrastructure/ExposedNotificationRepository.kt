@@ -14,6 +14,8 @@ object NotificationTable : Table("notifications") {
     val userId = integer("user_id")
     val message = varchar("message", 255)
     val isRead = bool("is_read").default(false)
+
+    override val primaryKey = PrimaryKey(id)
 }
 
 class ExposedNotificationRepository : NotificationRepository {

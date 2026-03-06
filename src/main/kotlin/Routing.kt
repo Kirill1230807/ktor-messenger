@@ -11,6 +11,7 @@ import com.example.infrastructure.ExposedMessageRepository
 import com.example.infrastructure.ExposedNotificationRepository
 import com.example.infrastructure.ExposedUserRepository
 import io.ktor.http.HttpStatusCode
+import io.ktor.server.plugins.swagger.swaggerUI
 import io.ktor.server.response.respond
 
 
@@ -26,6 +27,9 @@ fun Application.configureRouting() {
     val chatService = ChatService(messageRepository)
 
     routing {
+
+        swaggerUI(path = "swagger", swaggerFile = "openapi/documentation.yaml")
+
         get("/health") {
             call.respond(HttpStatusCode.OK, mapOf("status" to "Up", "timestamp" to System.currentTimeMillis()))
         }

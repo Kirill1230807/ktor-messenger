@@ -16,4 +16,7 @@ fun Application.module() {
     configureDatabases()
     configureMonitoring()
     configureRouting()
+    configureValidation()
+    configureExceptionHandling()
 }
+

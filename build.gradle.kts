@@ -6,6 +6,7 @@ val kotlin_version: String by project
 val logback_version: String by project
 val postgres_version: String by project
 
+
 plugins {
     kotlin("jvm") version "2.3.0"
     id("io.ktor.plugin") version "3.4.0"
@@ -49,9 +50,13 @@ dependencies {
     implementation(project(":chat"))
     implementation(project(":notifications"))
 
-    implementation("io.ktor:ktor-server-openapi:3.4.0")
-    implementation("io.ktor:ktor-server-routing-openapi:3.4.0")
-    implementation("io.ktor:ktor-server-swagger")
-    implementation("io.swagger:swagger-generator:3.0.0-rc1")
-    implementation("io.swagger.codegen.v3:swagger-codegen-generators:1.0.36")
+//    implementation("io.ktor:ktor-server-openapi:3.4.0")
+//    implementation("io.ktor:ktor-server-routing-openapi:3.4.0")
+//    implementation("io.swagger:swagger-generator:3.0.0-rc1")
+    implementation("io.ktor:ktor-server-request-validation:3.4.0")
+//    implementation("io.swagger.codegen.v3:swagger-codegen-generators:1.0.36")
+    implementation("io.ktor:ktor-server-status-pages:3.4.0")
+
+    // swagger
+    implementation("io.ktor:ktor-server-swagger:3.4.0")
 }

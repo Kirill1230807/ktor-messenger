@@ -23,11 +23,16 @@ import com.example.infrastructure.UserTable
 import org.jetbrains.exposed.sql.transactions.transaction
 
 fun Application.configureDatabases() {
+    val dbUrl = environment.config.property("database.url").getString()
+    val dbUser = environment.config.property("database.user").getString()
+    val dbPassword = environment.config.property("database.password").getString()
+    val dbDriver = environment.config.property("database.driver").getString()
+
     val database = Database.connect(
-        url = "jdbc:h2:mem:test;DB_CLOSE_DELAY=-1",
-        user = "root",
-        driver = "org.h2.Driver",
-        password = "",
+        url = dbUrl,
+        user = dbUser,
+        driver = dbDriver,
+        password = dbPassword
     )
 
     transaction(database) {

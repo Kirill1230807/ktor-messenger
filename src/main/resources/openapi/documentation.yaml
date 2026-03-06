@@ -1,27 +1,248 @@
 openapi: "3.0.0"
 info:
   title: "Messenger API"
-  description: "Лабораторні роботи для курсу \"Проєктування та реалізація мікросервісної архітектури\". Береговий К.О., 3 курс "
+  description: "Лабораторні роботи для курсу \"Проєктування та реалізація мікросервісної архітектури\". Береговий К.О., 3 курс."
   version: "1.0.0"
+servers:
+  - url: http://localhost:8080
+    description: Локальний сервер
+
 paths:
-  /users/register:
+  /health:
+    get:
+      tags:
+        - "Monitoring"
+      summary: "Перевірка стану сервера"
+      responses:
+        '200':
+          description: "Сервер працює нормально"
+
+  /api/v1/users/register:
     post:
+      tags:
+        - "Users"
       summary: "Реєстрація нового користувача"
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                username:
-                  type: string
-                email:
-                  type: string
-                password:
-                  type: string
+              $ref: '#/components/schemas/RegisterRequestDto'
       responses:
         '201':
           description: "Користувача успішно створено"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponseDto'
+        '400':
+          description: "Помилка валідації (неправильний формат пошти або короткий пароль)"
         '409':
           description: "Користувач з таким іменем або поштою вже існує"
+
+  /api/v1/users/{id}:
+    get:
+      tags:
+        - "Users"
+      summary: "Отримати користувача за ID"
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+      responses:
+        '200':
+          description: "Користувача знайдено"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponseDto'
+        '404':
+          description: "Користувача не знайдено"
+    delete:
+      tags:
+        - "Users"
+      summary: "Видалити користувача за ID"
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+      responses:
+        '200':
+          description: "Користувача успішно видалено"
+        '404':
+          description: "Користувача не знайдено"
+
+  /api/v1/chat/messages:
+    post:
+      tags:
+        - "Chat"
+      summary: "Відправити нове повідомлення"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendMessageDto'
+      responses:
+        '201':
+          description: "Повідомлення успішно відправлено"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponseDto'
+        '400':
+          description: "Помилка (наприклад, порожнє повідомлення)"
+
+  /api/v1/chat/history/{myId}/{contactId}:
+    get:
+      tags:
+        - "Chat"
+      summary: "Отримати історію листування між двома користувачами"
+      parameters:
+        - name: "myId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+        - name: "contactId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+      responses:
+        '200':
+          description: "Успішно отримано список повідомлень"
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: '#/components/schemas/MessageResponseDto'
+
+  /api/v1/notification:
+    post:
+      tags:
+        - "Notifications"
+      summary: "Створити нове сповіщення для користувача"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateNotificationDto'
+      responses:
+        '201':
+          description: "Сповіщення успішно створено"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationResponseDto'
+
+  /api/v1/notification/user/{userId}:
+    get:
+      tags:
+        - "Notifications"
+      summary: "Отримати всі непрочитані сповіщення користувача"
+      parameters:
+        - name: "userId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+      responses:
+        '200':
+          description: "Успішно отримано список сповіщень"
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: '#/components/schemas/NotificationResponseDto'
+
+  /api/v1/notification/{id}/read:
+    patch:
+      tags:
+        - "Notifications"
+      summary: "Позначити сповіщення як прочитане"
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+      responses:
+        '200':
+          description: "Сповіщення позначено як прочитане"
+        '404':
+          description: "Сповіщення не знайдено"
+
+components:
+  schemas:
+    RegisterRequestDto:
+      type: object
+      properties:
+        username:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+
+    UserResponseDto:
+      type: object
+      properties:
+        id:
+          type: integer
+        username:
+          type: string
+        email:
+          type: string
+
+    SendMessageDto:
+      type: object
+      properties:
+        senderId:
+          type: integer
+        receiverId:
+          type: integer
+        text:
+          type: string
+
+    MessageResponseDto:
+      type: object
+      properties:
+        id:
+          type: integer
+        senderId:
+          type: integer
+        receiverId:
+          type: integer
+        text:
+          type: string
+        timestamp:
+          type: integer
+          format: int64
+
+    CreateNotificationDto:
+      type: object
+      properties:
+        userId:
+          type: integer
+        message:
+          type: string
+
+    NotificationResponseDto:
+      type: object
+      properties:
+        id:
+          type: integer
+        userId:
+          type: integer
+        message:
+          type: string
+        isRead:
+          type: boolean

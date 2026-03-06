@@ -17,7 +17,7 @@ dependencies {
     implementation("io.ktor:ktor-server-core:3.4.0")
     implementation("io.ktor:ktor-serialization-kotlinx-json:3.4.0")
 
-    implementation("io.swagger:swagger-generator:3.0.0-rc1")
+    implementation("io.ktor:ktor-server-swagger:3.4.0")
     implementation("org.jetbrains.exposed:exposed-core:$exposed_version")
 }
 

@@ -22,16 +22,14 @@ fun Route.userRouting(userService: UserService) {
     route("/users") {
         post("/register") {
             val request = call.receive<RegisterRequestDto>()
+            val createdUser = userService.registerUser(request.username, request.email, request.password)
+            val responseDto = UserResponseDto(createdUser.id, createdUser.username, createdUser.email)
 
-            try {
-                val createdUser = userService.registerUser(request.username, request.email, request.password)
+            call.respond(HttpStatusCode.Created, responseDto)
 
-                val responseDto = UserResponseDto(createdUser.id, createdUser.username, createdUser.email)
-                call.respond(HttpStatusCode.Created, responseDto)
-            } catch (e: IllegalArgumentException) {
-                call.respond(HttpStatusCode.Conflict, mapOf("error" to e.message))
-            }
         }
+
+
         delete("/{id}") {
             val idParam = call.parameters["id"]
             val id = idParam?.toIntOrNull()
@@ -49,6 +47,8 @@ fun Route.userRouting(userService: UserService) {
                 call.respond(HttpStatusCode.NotFound, mapOf("error" to "Not found"))
             }
         }
+
+
         get("/{id}") {
             val idUser = call.parameters["id"]?.toIntOrNull()
 

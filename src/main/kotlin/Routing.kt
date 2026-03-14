@@ -13,6 +13,7 @@ import com.example.infrastructure.ExposedUserRepository
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.plugins.swagger.swaggerUI
 import io.ktor.server.response.respond
+import kotlinx.serialization.Serializable
 
 
 fun Application.configureRouting() {
@@ -26,12 +27,14 @@ fun Application.configureRouting() {
     val messageRepository = ExposedMessageRepository()
     val chatService = ChatService(messageRepository)
 
+    @Serializable
+    data class HealthResponse(val status: String, val timestamp: Long)
     routing {
 
         swaggerUI(path = "swagger", swaggerFile = "openapi/documentation.yaml")
 
         get("/health") {
-            call.respond(HttpStatusCode.OK, mapOf("status" to "Up", "timestamp" to System.currentTimeMillis()))
+            call.respond(HttpStatusCode.OK, HealthResponse("Up", System.currentTimeMillis()))
         }
         // Версійність API
         route("/api/v1") {

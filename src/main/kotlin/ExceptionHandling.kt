@@ -22,7 +22,7 @@ fun Application.configureExceptionHandling() {
             call.respond(HttpStatusCode.Conflict, ErrorResponse(409, cause.message ?: "Конфлікт даних"))
         }
         exception<Throwable> { call, cause ->
-            cause.printStackTrace() // щоб бачити помилку в консолі
+            cause.printStackTrace()
             call.respond(HttpStatusCode.InternalServerError, ErrorResponse(500, "Внутрішня помилка сервера"))
         }
     }

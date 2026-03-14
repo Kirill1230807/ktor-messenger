@@ -25,8 +25,9 @@ data class MessageResponseDto(
 fun Route.chatRoute(chatService: ChatService) {
     route("/chat") {
         post("/messages") {
+            val correlationId = call.request.headers["X-Correlation-ID"] ?: java.util.UUID.randomUUID().toString()
             val request = call.receive<SendMessageDto>()
-            val message = chatService.sendMessage(request.senderId, request.receiverId, request.text)
+            val message = chatService.sendMessage(request.senderId, request.receiverId, request.text, correlationId)
             val responseDto = MessageResponseDto(
                 message.id,
                 message.senderId,
@@ -34,6 +35,7 @@ fun Route.chatRoute(chatService: ChatService) {
                 message.text,
                 message.timestamp
             )
+            call.response.headers.append("X-Correlation-ID", correlationId)
             call.respond(HttpStatusCode.Created, responseDto)
         }
 

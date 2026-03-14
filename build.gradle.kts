@@ -50,13 +50,17 @@ dependencies {
     implementation(project(":chat"))
     implementation(project(":notifications"))
 
-//    implementation("io.ktor:ktor-server-openapi:3.4.0")
-//    implementation("io.ktor:ktor-server-routing-openapi:3.4.0")
-//    implementation("io.swagger:swagger-generator:3.0.0-rc1")
     implementation("io.ktor:ktor-server-request-validation:3.4.0")
-//    implementation("io.swagger.codegen.v3:swagger-codegen-generators:1.0.36")
     implementation("io.ktor:ktor-server-status-pages:3.4.0")
 
     // swagger
     implementation("io.ktor:ktor-server-swagger:3.4.0")
+
+    // Resilience4j
+    implementation("io.github.resilience4j:resilience4j-circuitbreaker:2.2.0")
+    implementation("io.github.resilience4j:resilience4j-retry:2.2.0")
+    implementation("io.github.resilience4j:resilience4j-kotlin:2.2.0")
+
+    implementation("io.ktor:ktor-server-netty:3.4.0")
+    implementation("io.ktor:ktor-server-config-yaml:3.4.0")
 }

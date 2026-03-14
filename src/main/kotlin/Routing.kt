@@ -10,6 +10,7 @@ import com.example.application.UserService
 import com.example.infrastructure.ExposedMessageRepository
 import com.example.infrastructure.ExposedNotificationRepository
 import com.example.infrastructure.ExposedUserRepository
+import com.example.infrastructure.UserClient
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.plugins.swagger.swaggerUI
 import io.ktor.server.response.respond
@@ -25,7 +26,8 @@ fun Application.configureRouting() {
     val notificationService = NotificationService(notificationRepository)
 
     val messageRepository = ExposedMessageRepository()
-    val chatService = ChatService(messageRepository)
+    val userClient = UserClient()
+    val chatService = ChatService(messageRepository, userClient)
 
     @Serializable
     data class HealthResponse(val status: String, val timestamp: Long)

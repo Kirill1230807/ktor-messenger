@@ -39,6 +39,10 @@ dependencies {
 
     implementation("org.jetbrains.exposed:exposed-jdbc:$exposed_version")
     implementation("com.h2database:h2:2.3.232")
+
+    // rabbitmq
+    implementation("com.rabbitmq:amqp-client:5.20.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
 }
 
 kotlin {

@@ -16,7 +16,7 @@ import java.time.Duration
 class UserClient {
     private val client = HttpClient(CIO) {
         install(HttpTimeout) {
-            requestTimeoutMillis = 2000
+            requestTimeoutMillis = 5000
         }
     }
 
@@ -28,7 +28,7 @@ class UserClient {
 
     private val retry = Retry.of("userService", RetryConfig.custom<RetryConfig>()
         .maxAttempts(3)
-        .waitDuration(Duration.ofMillis(500))
+        .waitDuration(Duration.ofMillis(5000))
         .build())
 
     suspend fun checkUserExist(userId: Int, correlationId: String?): Boolean {

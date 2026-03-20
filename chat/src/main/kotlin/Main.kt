@@ -25,6 +25,7 @@ fun Application.chatModule() {
         json()
     }
 
+    // окрема бд для мікросервісу Chat
     Database.connect("jdbc:h2:mem:chatdb;DB_CLOSE_DELAY=-1", driver = "org.h2.Driver")
     transaction {
         SchemaUtils.create(MessageTable)

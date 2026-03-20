@@ -2,6 +2,9 @@ package com.example.infrastructure
 
 import com.example.domain.Message
 import com.example.domain.MessageRepository
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import org.jetbrains.exposed.sql.SortOrder
 import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.and
@@ -20,19 +23,42 @@ object MessageTable : Table("message") {
     override val primaryKey = PrimaryKey(id)
 }
 
+object OutboxTable : Table("outbox") {
+    val id = integer("id").autoIncrement()
+    val eventType = varchar("event_type", 50)
+    val payload = text("payload")
+    val isProcessed = bool("is_processed").default(false)
+
+    override val primaryKey = PrimaryKey(id)
+}
+
+@Serializable
+data class MessageSentEvent(val receiverId: Int, val text: String)
+
+
 class ExposedMessageRepository : MessageRepository {
+
     override suspend fun sendMessage(
         senderId: Int,
         receiverId: Int,
         text: String,
         timestamp: Long
     ): Message = newSuspendedTransaction {
+
         val insertStatement = MessageTable.insert {
             it[this.senderId] = senderId
             it[this.receiverId] = receiverId
             it[this.text] = text
             it[this.timestamp] = timestamp
         }
+
+        val eventPayload = Json.encodeToString(MessageSentEvent(receiverId, text))
+        OutboxTable.insert {
+            it[this.eventType] = "MessageSent"
+            it[this.payload] = eventPayload
+            it[this.isProcessed] = false
+        }
+
         Message(
             id = insertStatement[MessageTable.id] ?: 0,
             senderId = senderId,

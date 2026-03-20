@@ -23,7 +23,7 @@ fun Application.userModule() {
         json()
     }
 
-    // 2. Ініціалізуємо власну базу даних для цього мікросервісу
+    // окрема бд для мікросервісу User
     Database.connect("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1", driver = "org.h2.Driver")
     transaction {
         SchemaUtils.create(UserTable)

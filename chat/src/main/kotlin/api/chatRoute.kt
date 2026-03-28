@@ -19,7 +19,8 @@ data class MessageResponseDto(
     val senderId: Int,
     val receiverId: Int,
     val text: String,
-    val timestamp: Long
+    val timestamp: Long,
+    val status: String
 )
 
 fun Route.chatRoute(chatService: ChatService) {
@@ -33,7 +34,8 @@ fun Route.chatRoute(chatService: ChatService) {
                 message.senderId,
                 message.receiverId,
                 message.text,
-                message.timestamp
+                message.timestamp,
+                message.status
             )
             call.response.headers.append("X-Correlation-ID", correlationId)
             call.respond(HttpStatusCode.Created, responseDto)
@@ -50,7 +52,7 @@ fun Route.chatRoute(chatService: ChatService) {
 
             val history = chatService.getChatHistory(myId, contactId)
             val response = history.map {
-                MessageResponseDto(it.id, it.senderId, it.receiverId, it.text, it.timestamp)
+                MessageResponseDto(it.id, it.senderId, it.receiverId, it.text, it.timestamp, it.status)
             }
             call.respond(HttpStatusCode.OK, response)
         }

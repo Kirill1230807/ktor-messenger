@@ -2,6 +2,7 @@ package com.example.application
 
 import com.rabbitmq.client.ConnectionFactory
 import com.rabbitmq.client.DeliverCallback
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
@@ -9,13 +10,18 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.encodeToString
 
 @Serializable
-data class MessageSentEvent(val receiverId: Int, val text: String)
+data class MessageSentEvent(val receiverId: Int, val text: String, val messageId: Int)
+
+@Serializable
+data class NotificationReplyEvent(val messageId: Int, val status: String)
 
 class NotificationConsumer(private val notificationService: NotificationService) {
     private val QUEUE_NAME = "notification_events"
 
+    @OptIn(DelicateCoroutinesApi::class)
     fun startListening() {
         GlobalScope.launch(Dispatchers.IO) {
             val factory = ConnectionFactory().apply { host = "localhost" }
@@ -36,16 +42,39 @@ class NotificationConsumer(private val notificationService: NotificationService)
                             val event = Json.decodeFromString<MessageSentEvent>(message)
 
                             GlobalScope.launch {
-                                notificationService.createNotification(
-                                    userId = event.receiverId,
-                                    message = "У вас нове повідомлення: ${event.text}"
-                                )
-                                println("Сповіщення для користувача ${event.receiverId} успішно створено.")
+                                if (event.text == "error") {
+                                    println(" [!] Імітація помилки для повідомлення ${event.messageId}")
+                                    val error = NotificationReplyEvent(event.messageId, "ERROR")
+                                    val responseJson = Json.encodeToString(error)
+                                    channel.basicPublish(
+                                        "",
+                                        "chat_replies",
+                                        null,
+                                        responseJson.toByteArray(Charsets.UTF_8)
+                                    )
+                                    println(" [x] Відправлено статус ERROR для повідомлення ${event.messageId}")
+                                } else {
+                                    notificationService.createNotification(
+                                        userId = event.receiverId,
+                                        message = "У вас нове повідомлення: ${event.text}"
+                                    )
+                                    println("Сповіщення для користувача ${event.receiverId} успішно створено.")
+                                    val successReply = NotificationReplyEvent(event.messageId, "SUCCESS")
+                                    val responseJson = Json.encodeToString(successReply)
+                                    channel.basicPublish(
+                                        "",
+                                        "chat_replies",
+                                        null,
+                                        responseJson.toByteArray(Charsets.UTF_8)
+                                    )
+                                    println(" [x] Відправлено статус SUCCESS для повідомлення ${event.messageId}")
+                                }
                             }
                         } catch (e: Exception) {
                             println("Помилка обробки події: ${e.message}")
                         }
                     }
+
 
                     channel.basicConsume(QUEUE_NAME, true, deliverCallback, { _ -> })
 

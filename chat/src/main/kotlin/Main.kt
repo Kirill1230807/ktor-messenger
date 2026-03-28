@@ -1,8 +1,10 @@
 package com.example
 
 import com.example.api.chatRoute
+import com.example.application.ChatReplyConsumer
 import com.example.application.ChatService
 import com.example.application.OutboxRelay
+import com.example.domain.MessageRepository
 import com.example.infrastructure.ExposedMessageRepository
 import com.example.infrastructure.MessageTable
 import com.example.infrastructure.OutboxTable
@@ -24,20 +26,21 @@ fun main(args: Array<String>) {
 }
 
 fun Application.chatModule() {
-    val relay = OutboxRelay()
-    relay.startRelay()
-
     install(ContentNegotiation) {
         json()
     }
 
-    // окрема бд для мікросервісу Chat
     Database.connect("jdbc:h2:mem:chatdb;DB_CLOSE_DELAY=-1", driver = "org.h2.Driver")
     transaction {
         SchemaUtils.create(MessageTable, OutboxTable)
     }
 
+    val relay = OutboxRelay()
+    relay.startRelay()
     val messageRepository = ExposedMessageRepository()
+
+    val consumer = ChatReplyConsumer(messageRepository)
+    consumer.startListening()
 
     val userClient = UserClient()
     val chatService = ChatService(messageRepository, userClient)

@@ -6,12 +6,14 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.jetbrains.exposed.sql.SortOrder
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.or
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
+import org.jetbrains.exposed.sql.update
 
 object MessageTable : Table("message") {
     val id = integer("id").autoIncrement()
@@ -19,6 +21,7 @@ object MessageTable : Table("message") {
     val receiverId = integer("receiver_id")
     val text = varchar("text", 255)
     val timestamp = long("timestamp")
+    val status = varchar("status", 50)
 
     override val primaryKey = PrimaryKey(id)
 }
@@ -33,8 +36,10 @@ object OutboxTable : Table("outbox") {
 }
 
 @Serializable
-data class MessageSentEvent(val receiverId: Int, val text: String)
+data class MessageSentEvent(val receiverId: Int, val text: String, val messageId: Int)
 
+@Serializable
+data class NotificationReplyEvent(val messageId: Int, val status: String)
 
 class ExposedMessageRepository : MessageRepository {
 
@@ -50,9 +55,11 @@ class ExposedMessageRepository : MessageRepository {
             it[this.receiverId] = receiverId
             it[this.text] = text
             it[this.timestamp] = timestamp
+            it[this.status] = "PENDING"
         }
+        val generatedMessageId = insertStatement[MessageTable.id] ?: 0
 
-        val eventPayload = Json.encodeToString(MessageSentEvent(receiverId, text))
+        val eventPayload = Json.encodeToString(MessageSentEvent(receiverId, text, generatedMessageId))
         OutboxTable.insert {
             it[this.eventType] = "MessageSent"
             it[this.payload] = eventPayload
@@ -60,11 +67,12 @@ class ExposedMessageRepository : MessageRepository {
         }
 
         Message(
-            id = insertStatement[MessageTable.id] ?: 0,
+            id = insertStatement[MessageTable.id],
             senderId = senderId,
             receiverId = receiverId,
             text = text,
-            timestamp = timestamp
+            timestamp = timestamp,
+            status = "PENDING"
         )
     }
 
@@ -84,8 +92,19 @@ class ExposedMessageRepository : MessageRepository {
                     senderId = it[MessageTable.senderId],
                     receiverId = it[MessageTable.receiverId],
                     text = it[MessageTable.text],
-                    timestamp = it[MessageTable.timestamp]
+                    timestamp = it[MessageTable.timestamp],
+                    status = it[MessageTable.status]
                 )
             }
+    }
+
+    override suspend fun updateMessageStatus(
+        messageId: Int,
+        newStatus: String
+    ): Boolean = newSuspendedTransaction {
+        val updateRowsCount = MessageTable.update({ MessageTable.id eq messageId }) {
+            it[this.status] = newStatus
+        }
+        updateRowsCount > 0
     }
 }

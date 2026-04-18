@@ -10,13 +10,9 @@ fun main(args: Array<String>) {
 }
 
 fun Application.module() {
-    configureSockets()
     configureSerialization()
-    configureSecurity()
-    configureDatabases()
     configureMonitoring()
     configureRouting()
-    configureValidation()
     configureExceptionHandling()
 }
 

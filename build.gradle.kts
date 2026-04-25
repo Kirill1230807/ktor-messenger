@@ -67,4 +67,10 @@ dependencies {
 
     implementation("io.ktor:ktor-server-netty:3.4.0")
     implementation("io.ktor:ktor-server-config-yaml:3.4.0")
+
+    implementation("io.ktor:ktor-server-auth:3.4.0")
+    implementation("io.ktor:ktor-server-auth-jwt:3.4.0")
+    implementation("io.ktor:ktor-server-rate-limit:3.4.0")
+    implementation("io.ktor:ktor-server-metrics-micrometer:3.4.0")
+    implementation("io.micrometer:micrometer-registry-prometheus:1.12.1")
 }

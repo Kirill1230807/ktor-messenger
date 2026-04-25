@@ -11,7 +11,6 @@ fun Application.configureSerialization() {
     }
 }
 
-// Валідація вхідних даних
 fun Application.configureValidation() {
     install(RequestValidation) {
         validate<RegisterRequestDto> { dto ->

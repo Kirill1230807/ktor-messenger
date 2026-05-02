@@ -14,3 +14,10 @@ services:
       - "9090:9090"
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
+
+  consul:
+    image: hashicorp/consul:latest
+    container_name: consul_server
+    ports:
+      - "8500:8500"
+    command: "agent -dev -client=0.0.0.0"

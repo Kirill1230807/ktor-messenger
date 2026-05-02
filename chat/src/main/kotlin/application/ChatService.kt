@@ -1,5 +1,6 @@
 package com.example.application
 
+import com.example.configManager
 import com.example.domain.Message
 import com.example.domain.MessageRepository
 import com.example.infrastructure.UserClient
@@ -8,6 +9,14 @@ class ChatService(
     private val messageRepository: MessageRepository,
     private val userClient: UserClient
 ) {
+
+//    fun getMessagesForUser() {
+//        // Кожного разу при виклику методу береться НАЙСВІЖІШЕ значення
+//        val currentLimit = configManager.getMessageLimit()
+//        println("Витягуємо з БД повідомлення. Ліміт: $currentLimit")
+//        // ... логіка виклику ExposedMessageRepository ...
+//    }
+
     suspend fun sendMessage(senderId: Int, receiverId: Int, text: String, correlationId: String? = null): Message {
         if (text.isBlank()) {
             throw IllegalArgumentException("Message cannot be empty")
@@ -25,4 +34,6 @@ class ChatService(
     suspend fun getChatHistory(myId: Int, contactId: Int): List<Message> {
         return messageRepository.getHistory(myId, contactId)
     }
+
+
 }

@@ -1,33 +1,27 @@
-package com.example
-
+import com.example.CityService
+import com.example.application.ConsulConfigManager
 import com.example.infrastructure.MessageTable
 import com.example.infrastructure.NotificationTable
-import io.ktor.http.*
-import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
-import io.ktor.server.plugins.calllogging.*
-import io.ktor.server.plugins.contentnegotiation.*
-import io.ktor.server.plugins.statuspages.*
-import io.ktor.server.request.*
-import io.ktor.server.response.*
-import io.ktor.server.routing.*
-import io.ktor.server.websocket.*
-import io.ktor.websocket.*
 import java.sql.Connection
 import java.sql.DriverManager
-import java.time.Duration
-import kotlin.time.Duration.Companion.seconds
 import org.jetbrains.exposed.sql.*
-import org.slf4j.event.*
 import com.example.infrastructure.UserTable
 import org.jetbrains.exposed.sql.transactions.transaction
 
-fun Application.configureDatabases() {
-    val dbUrl = environment.config.property("database.url").getString()
-    val dbUser = environment.config.property("database.user").getString()
-    val dbPassword = environment.config.property("database.password").getString()
-    val dbDriver = environment.config.property("database.driver").getString()
+fun Application.configureDatabases(configManager: ConsulConfigManager) {
+    // 1. Отримуємо нечутливі налаштування (Application-specific) з Consul
+    // Якщо Consul недоступний, використовуємо фоллбек для локальної H2
+    val dbUrl = configManager.getConfigValue("database_url") ?: "jdbc:h2:file:./data/chat_db;DB_CLOSE_DELAY=-1"
+    val dbDriver = configManager.getConfigValue("database_driver") ?: "org.h2.Driver"
 
+    // 2. Отримуємо секрети (Secrets Management) зі змінних середовища ОС
+    val dbUser = System.getenv("DB_USER") ?: "root"
+    val dbPassword = System.getenv("DB_PASSWORD") ?: ""
+
+    log.info("Connecting to H2 database at $dbUrl")
+
+    // 3. Ініціалізуємо підключення для Exposed
     val database = Database.connect(
         url = dbUrl,
         user = dbUser,
@@ -35,48 +29,13 @@ fun Application.configureDatabases() {
         password = dbPassword
     )
 
+    // 4. Створюємо таблиці
     transaction(database) {
-        SchemaUtils.create(UserTable)
-        SchemaUtils.create(NotificationTable)
-        SchemaUtils.create(MessageTable)
+        SchemaUtils.create(UserTable, NotificationTable, MessageTable)
     }
-    val dbConnection: Connection = connectToPostgres(embedded = true)
+
+    // 5. Оскільки твій CityService вимагає raw JDBC Connection,
+    // створюємо його напряму, використовуючи ті самі змінні та секрети
+    val dbConnection: Connection = DriverManager.getConnection(dbUrl, dbUser, dbPassword)
     val cityService = CityService(dbConnection)
-
-}
-
-/**
- * Makes a connection to a Postgres database.
- *
- * In order to connect to your running Postgres process,
- * please specify the following parameters in your configuration file:
- * - postgres.url -- Url of your running database process.
- * - postgres.user -- Username for database connection
- * - postgres.password -- Password for database connection
- *
- * If you don't have a database process running yet, you may need to [download]((https://www.postgresql.org/download/))
- * and install Postgres and follow the instructions [here](https://postgresapp.com/).
- * Then, you would be able to edit your url,  which is usually "jdbc:postgresql://host:port/database", as well as
- * user and password values.
- *
- *
- * @param embedded -- if [true] defaults to an embedded database for tests that runs locally in the same process.
- * In this case you don't have to provide any parameters in configuration file, and you don't have to run a process.
- *
- * @return [Connection] that represent connection to the database. Please, don't forget to close this connection when
- * your application shuts down by calling [Connection.close]
- * */
-fun Application.connectToPostgres(embedded: Boolean): Connection {
-    Class.forName("org.postgresql.Driver")
-    if (embedded) {
-        log.info("Using embedded H2 database for testing; replace this flag to use postgres")
-        return DriverManager.getConnection("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1", "root", "")
-    } else {
-        val url = environment.config.property("postgres.url").getString()
-        log.info("Connecting to postgres database at $url")
-        val user = environment.config.property("postgres.user").getString()
-        val password = environment.config.property("postgres.password").getString()
-
-        return DriverManager.getConnection(url, user, password)
-    }
 }

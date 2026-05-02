@@ -43,6 +43,11 @@ dependencies {
     // rabbitmq
     implementation("com.rabbitmq:amqp-client:5.20.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
+
+    //
+    implementation("io.ktor:ktor-client-cio-jvm:2.3.0") // або версія, яку ти використовуєш
+    implementation("io.ktor:ktor-client-content-negotiation-jvm:2.3.0")
+    implementation("io.ktor:ktor-serialization-kotlinx-json-jvm:2.3.0")
 }
 
 kotlin {

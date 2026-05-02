@@ -1,0 +1,10 @@
+ktor:
+  application:
+    modules:
+      - com.example.MainKt.chatModule
+  deployment:
+    port: 8082
+database:
+  url: "jdbc:postgresql://postgres-host:5432/chatdb_prod"
+  user: ${DB_USER}
+  password: ${DB_PASSWORD}

@@ -9,3 +9,7 @@ dependencyResolutionManagement {
 include("users")
 include("chat")
 include("notifications")
+
+include("users")
+include("chat")
+include("notifications")

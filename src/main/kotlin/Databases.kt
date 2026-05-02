@@ -1,5 +1,5 @@
 import com.example.CityService
-import com.example.application.ConsulConfigManager
+import application.ConsulConfigManager
 import com.example.infrastructure.MessageTable
 import com.example.infrastructure.NotificationTable
 import io.ktor.server.application.*

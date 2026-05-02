@@ -28,6 +28,10 @@ dependencies {
 
     implementation("org.jetbrains.exposed:exposed-jdbc:$exposed_version")
     implementation("com.h2database:h2:2.3.232")
+
+    implementation("io.ktor:ktor-client-core:3.4.0")
+    implementation("io.ktor:ktor-client-cio:3.4.0")
+    implementation("io.ktor:ktor-client-content-negotiation:3.4.0")
 }
 
 kotlin {

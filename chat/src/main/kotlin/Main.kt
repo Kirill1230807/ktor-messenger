@@ -1,9 +1,9 @@
 package com.example
 
+import application.ConsulConfigManager
 import com.example.api.chatRoute
 import com.example.application.ChatReplyConsumer
 import com.example.application.ChatService
-import com.example.application.ConsulConfigManager
 import com.example.application.OutboxRelay
 import com.example.domain.MessageRepository
 import com.example.infrastructure.ExposedMessageRepository

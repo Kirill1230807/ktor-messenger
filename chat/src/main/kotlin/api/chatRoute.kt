@@ -1,9 +1,11 @@
 package com.example.api
 
 import com.example.application.ChatService
+import com.example.configManager
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
+import io.ktor.server.response.respondText
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.get
 import io.ktor.server.routing.post
@@ -55,6 +57,13 @@ fun Route.chatRoute(chatService: ChatService) {
                 MessageResponseDto(it.id, it.senderId, it.receiverId, it.text, it.timestamp, it.status)
             }
             call.respond(HttpStatusCode.OK, response)
+        }
+        get("/config-test") {
+            // Отримуємо поточне значення з Consul
+            val limit = configManager.getConfigValue("message_limit") ?: "Not set"
+            val timeout = configManager.getConfigValue("default_timeout") ?: "Not set"
+
+            call.respondText("Current Chat Limit: $limit, Global Timeout: $timeout")
         }
     }
 }

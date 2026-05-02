@@ -34,6 +34,10 @@ dependencies {
     implementation("com.h2database:h2:2.3.232")
 
     implementation("ch.qos.logback:logback-classic:1.5.13")
+
+    implementation("io.ktor:ktor-client-core:3.4.0")
+    implementation("io.ktor:ktor-client-cio:3.4.0")
+    implementation("io.ktor:ktor-client-content-negotiation:3.4.0")
 }
 
 kotlin {

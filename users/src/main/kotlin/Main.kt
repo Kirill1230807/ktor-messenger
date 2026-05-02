@@ -7,13 +7,22 @@ import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.routing.*
 import io.ktor.server.application.*
 import com.example.api.userRouting
+import com.example.application.ConsulConfigManager
 import com.example.infrastructure.UserTable
 import io.ktor.server.netty.EngineMain
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
 
+val profile = System.getenv("APP_PROFILE") ?: "dev"
+val configManager = ConsulConfigManager("users", profile)
+
 fun main(args: Array<String>) {
+    GlobalScope.launch {
+        configManager.startWatching()
+    }
     EngineMain.main(args)
 }
 

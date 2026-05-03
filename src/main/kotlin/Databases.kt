@@ -17,7 +17,7 @@ fun Application.configureDatabases(configManager: ConsulConfigManager) {
 
     // 2. Отримуємо секрети (Secrets Management) зі змінних середовища ОС
     val dbUser = System.getenv("DB_USER") ?: "root"
-    val dbPassword = System.getenv("DB_PASSWORD") ?: ""
+    val dbPassword = System.getenv("DB_PASSWORD") ?: "password"
 
     log.info("Connecting to H2 database at $dbUrl")
 

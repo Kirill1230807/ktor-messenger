@@ -1,6 +1,6 @@
 package com.example.application
 
-import com.example.configManager
+//import com.example.configManager
 import com.example.domain.Message
 import com.example.domain.MessageRepository
 import com.example.infrastructure.UserClient

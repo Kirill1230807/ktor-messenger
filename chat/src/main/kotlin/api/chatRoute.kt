@@ -2,7 +2,7 @@ package com.example.api
 
 import application.ConsulConfigManager
 import com.example.application.ChatService
-import com.example.configManager
+//import com.example.configManager
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond

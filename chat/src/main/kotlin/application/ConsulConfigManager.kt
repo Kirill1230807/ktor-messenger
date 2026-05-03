@@ -29,13 +29,14 @@ class ConsulConfigManager(
 
     // Функція, яка працюватиме у фоні і перевірятиме оновлення
     suspend fun startWatching() = coroutineScope {
+        println("🔵 [CONSUL] Запускаємо менеджер для сервісу: $serviceName, профіль: $profile")
         while (isActive) {
             val newConfig = fetchConfig()
             if (newConfig.isNotEmpty() && newConfig != _configFlow.value) {
                 _configFlow.value = newConfig
-                println("Оновлено конфігурацію з Consul!")
+                println("🟢 [CONSUL] Оновлено конфігурацію! Поточні дані: ${_configFlow.value}")
             }
-            delay(10000) // Перевіряємо кожні 10 секунд (Runtime Refresh)
+            delay(10000)
         }
     }
 
@@ -53,21 +54,30 @@ class ConsulConfigManager(
 
     private suspend fun fetchFromConsul(path: String): Map<String, String> {
         val result = mutableMapOf<String, String>()
+        val url = "$consulHost/$path?recurse=true"
+        println("🟡 [CONSUL] Робимо запит за адресою: $url")
+
         try {
-            val response: HttpResponse = client.get("$consulHost/$path?recurse=true")
+            val response: HttpResponse = client.get(url)
             if (response.status.value == 200) {
-                val jsonArray = Json.Default.parseToJsonElement(response.bodyAsText()).jsonArray
+                val responseText = response.bodyAsText()
+                println("🟣 [CONSUL] Отримано сиру відповідь: $responseText")
+
+                val jsonArray = Json.parseToJsonElement(responseText).jsonArray
                 for (element in jsonArray) {
                     val key = element.jsonObject["Key"]?.jsonPrimitive?.content ?: continue
                     val base64Value = element.jsonObject["Value"]?.jsonPrimitive?.content ?: continue
-                    val decodedValue = String(Base64.getDecoder().decode(base64Value))
 
+                    // Декодуємо Base64
+                    val decodedValue = String(Base64.getDecoder().decode(base64Value))
                     val simpleKey = key.substringAfterLast("/")
                     result[simpleKey] = decodedValue
                 }
+            } else {
+                println("🔴 [CONSUL] Помилка від Consul. Статус: ${response.status.value} для шляху: $path")
             }
         } catch (e: Exception) {
-            println("Помилка підключення до Consul: ${e.message}")
+            println("🔴 [CONSUL] Помилка з'єднання: ${e.message}")
         }
         return result
     }

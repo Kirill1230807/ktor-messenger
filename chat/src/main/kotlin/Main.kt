@@ -17,25 +17,22 @@ import io.ktor.server.application.install
 import io.ktor.server.netty.EngineMain
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
 
-val profile = System.getenv("APP_PROFILE") ?: "dev"
-val configManager = ConsulConfigManager("chat", profile)
-
-fun main(args: Array<String>) {
-    GlobalScope.launch {
-        configManager.startWatching()
-    }
-    EngineMain.main(args)
-}
-
 fun Application.chatModule() {
+    val profile = System.getenv("APP_PROFILE") ?: "dev"
+    val configManager = ConsulConfigManager("chat", profile)
     install(ContentNegotiation) {
         json()
+    }
+
+    GlobalScope.launch(Dispatchers.IO) {
+        configManager.startWatching()
     }
 
     Database.connect("jdbc:h2:mem:chatdb;DB_CLOSE_DELAY=-1", driver = "org.h2.Driver")
@@ -58,4 +55,11 @@ fun Application.chatModule() {
             chatRoute(chatService, configManager)
         }
     }
+}
+
+fun main(args: Array<String>) {
+//    GlobalScope.launch {
+//        configManager.startWatching()
+//    }
+//    EngineMain.main(args)
 }

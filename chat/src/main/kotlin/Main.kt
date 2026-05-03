@@ -55,7 +55,7 @@ fun Application.chatModule() {
 
     routing {
         route("/api/v1") {
-            chatRoute(chatService)
+            chatRoute(chatService, configManager)
         }
     }
 }

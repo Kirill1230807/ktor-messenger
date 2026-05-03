@@ -32,8 +32,8 @@ fun Application.userModule() {
         json()
     }
 
-    val dbPassword = System.getenv("DB_PASSWORD")
-        ?: throw IllegalStateException("DB_PASSWORD environment variable is not set!")
+//    val dbPassword = System.getenv("DB_PASSWORD")
+//        ?: throw IllegalStateException("DB_PASSWORD environment variable is not set!")
 
     // окрема бд для мікросервісу User
     Database.connect(

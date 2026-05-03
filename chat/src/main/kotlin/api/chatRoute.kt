@@ -1,5 +1,6 @@
 package com.example.api
 
+import application.ConsulConfigManager
 import com.example.application.ChatService
 import com.example.configManager
 import io.ktor.http.HttpStatusCode
@@ -25,7 +26,7 @@ data class MessageResponseDto(
     val status: String
 )
 
-fun Route.chatRoute(chatService: ChatService) {
+fun Route.chatRoute(chatService: ChatService, configManager: ConsulConfigManager) {
     route("/chat") {
         post("/messages") {
             val correlationId = call.request.headers["X-Correlation-ID"] ?: java.util.UUID.randomUUID().toString()
